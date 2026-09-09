@@ -1,6 +1,6 @@
 {
-  "name": "superpowers-dev",
-  "description": "Development marketplace for Superpowers core skills library",
+  "name": "superpowers-leo",
+  "description": "Leonardo's fork of the Superpowers core skills library",
   "owner": {
     "name": "Jesse Vincent",
     "email": "jesse@fsck.com"
@@ -9,7 +9,7 @@
     {
       "name": "superpowers",
       "description": "Core skills library for Claude Code: TDD, debugging, collaboration patterns, and proven techniques",
-      "version": "6.3.0",
+      "version": "6.4.0-leo.1",
       "source": "./",
       "author": {
         "name": "Jesse Vincent",

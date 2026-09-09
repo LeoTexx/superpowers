@@ -232,16 +232,12 @@ Everything you paste into a dispatch prompt — and everything a subagent
 prints back — stays resident in your context for the rest of the session
 and is re-read on every later turn. Hand artifacts over as files.
 
-**Waiting on dispatched subagents:** never poll a wait interface with
-short timeouts, and never sit in one silent, open-ended wait either.
-While you have local work — ledger updates, packaging the next review,
-reading reports — keep working; child results arrive on their own.
-When you are genuinely idle, wait in bounded stretches (five to ten
-minutes, where your platform allows), and between stretches post one
-line of status and reconcile your live children: list them, and chase
-any that finished without reporting. A bounded stretch keeps nearly
-all of a long wait's efficiency while guaranteeing a stuck or lost
-child is noticed within minutes, not at the end of the session.
+**Waiting on dispatched subagents:** a finished subagent notifies you. Do not
+poll for it, do not schedule wake-ups to check on it, and do not sit in a
+silent open-ended wait. Keep doing local work while children run — ledger
+updates, packaging the next review, reading reports. Never state or infer a
+pending agent's result before its notification arrives: a predicted result that
+turns out wrong is worse than no result, because it reads as evidence.
 
 ### 1. Dispatch the implementer
 
@@ -279,7 +275,15 @@ and fix-round diffs need it.
   a pointer to that ledger entry in the dispatch.
 - Record the implementer's agent identity from the dispatch result —
   fix-loop rounds 1-3 resume this agent.
-- Never dispatch multiple implementation subagents in parallel (conflicts).
+- Dispatch implementers in parallel ONLY when one of these is true, checked
+  before dispatch: the plan states each task's file ownership and the sets do
+  not intersect; or each implementer runs under `isolation: "worktree"`.
+  Neither true — including "the plan does not say" — means serial. Your
+  impression that two tasks look unrelated is not stated ownership.
+  A shared manifest, lockfile, or generated file is an intersection, and a
+  worktree does not fix it: it moves the conflict to merge time. Give that
+  file one owner or serialize the tasks that touch it.
+  Reviewers never write, so reviews of separate tasks always parallelize.
 
 Template: [implementer-prompt.md](implementer-prompt.md)
 
@@ -455,6 +459,13 @@ superpowers:requesting-code-review's
 the ledger's deferred-minor and parked lines so it can triage which must be
 fixed before merge.
 
+For a large or high-risk branch there is a stronger option: `claude ultrareview`
+runs a cloud-hosted multi-agent review of the whole branch. **You cannot launch
+it** — it is user-triggered and separately billed. Dispatch the ordinary final
+reviewer regardless, so the branch is never left unreviewed while you wait on a
+human, and surface `ultrareview` as a recommendation when you hand the finished
+work over.
+
 If the final whole-branch review returns findings, dispatch ONE fix subagent
 with the complete findings list — not one fixer per finding.
 Per-finding fixers each rebuild context and re-run suites; a real
@@ -498,6 +509,9 @@ Use superpowers:finishing-a-development-branch.
 | "The fix was small, skip the re-review" | Unreviewed fixes are how regressions land. Every round ends with a scoped re-review. |
 | "Reviews slow the loop down" | The loop without reviews is just unverified churn. Reviews are the loop's brakes and steering. |
 | "Ledger bookkeeping is overhead" | The ledger is what survives compaction. Controllers without one have re-dispatched entire completed task sequences. |
+| "The tasks look unrelated, so they can run in parallel" | Looking unrelated is not stated file ownership. Unstated ownership is serial. |
+| "They only both touch one shared file" | One shared file is an intersection. Give it an owner, or serialize. |
+| "I gave them worktrees, so any collision is safe now" | Not for manifests, lockfiles, or generated files. Those conflict at merge instead. |
 | "The implementer spawned its own reviewer — free extra assurance" | It's a duplicate seat reviewing the same diff; the task review is the gate. A worker-spawned reviewer is a defect to flag, not rigor. |
 
 ## Example Workflow
