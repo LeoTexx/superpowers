@@ -11,7 +11,22 @@ Load plan, review critically, execute all tasks, report when complete.
 
 **Announce at start:** "I'm using the executing-plans skill to implement this plan."
 
-**Note:** Tell your human partner that Superpowers works much better with access to subagents (Claude Code, Codex CLI, Codex App, Copilot CLI, and Gemini CLI all qualify; see the per-platform tool refs in `../using-superpowers/references/`). If subagents are available, use superpowers:subagent-driven-development instead of this skill.
+**This skill is the fallback route, not the default one.** It executes a plan
+inline, in this session, by hand. Before using it, check whether one of these
+fits better:
+
+| Situation | Route |
+|---|---|
+| Subagents are available | **superpowers:subagent-driven-development** — fresh implementer per task, review between tasks |
+| The plan is self-contained and should not hold this session | A background session: `claude --bg`, watched with `claude agents` |
+| The plan has several streams that must agree on contracts as they go | Agent Teams — see the `maestro` skill |
+| None of the above, or no subagents at all | This skill |
+
+Subagents are available on Claude Code, Codex CLI, Codex App, Copilot CLI and
+Gemini CLI; see the per-platform tool refs in
+`../using-superpowers/references/`. Use **superpowers:orchestrating-agents** to
+choose between the routes; come back here when the answer is "execute it
+inline."
 
 ## The Process
 

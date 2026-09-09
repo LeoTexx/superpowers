@@ -7,7 +7,9 @@ description: Use when facing 2+ independent tasks that can be worked on without 
 
 ## Overview
 
-You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
+You delegate tasks to agents that run on their own context, not yours. That keeps them focused and keeps your own context free for coordination.
+
+What context they start from is a choice you make, not a rule. A **fresh** subagent gets only what you construct for it. A **forked** subagent inherits this conversation. Both leave your working context intact; they differ in what the agent knows when it starts. See "Fresh or forked" below.
 
 When you have multiple unrelated failures (different test files, different subsystems, different bugs), investigating them sequentially wastes time. Each investigation is independent and can happen in parallel.
 
@@ -21,15 +23,15 @@ digraph when_to_use {
     "Are they independent?" [shape=diamond];
     "Single agent investigates all" [shape=box];
     "One agent per problem domain" [shape=box];
-    "Can they work in parallel?" [shape=diamond];
-    "Sequential agents" [shape=box];
-    "Parallel dispatch" [shape=box];
+    "Do they write the same files?" [shape=diamond];
+    "Parallel dispatch, one checkout" [shape=box];
+    "Parallel dispatch, isolated" [shape=box];
 
     "Multiple failures?" -> "Are they independent?" [label="yes"];
     "Are they independent?" -> "Single agent investigates all" [label="no - related"];
-    "Are they independent?" -> "Can they work in parallel?" [label="yes"];
-    "Can they work in parallel?" -> "Parallel dispatch" [label="yes"];
-    "Can they work in parallel?" -> "Sequential agents" [label="no - shared state"];
+    "Are they independent?" -> "Do they write the same files?" [label="yes"];
+    "Do they write the same files?" -> "Parallel dispatch, one checkout" [label="no"];
+    "Do they write the same files?" -> "Parallel dispatch, isolated" [label="yes"];
 }
 ```
 
@@ -42,7 +44,51 @@ digraph when_to_use {
 **Don't use when:**
 - Failures are related (fix one might fix others)
 - Need to understand full system state
-- Agents would interfere with each other
+
+**Overlapping files is not on that list.** Two agents that would write the same
+file need isolation, not serialization — see "Overlap means isolate" below.
+
+## Overlap means isolate
+
+Two agents that would write the same file are not a reason to give up on
+parallelism. They are a reason to give each one its own working tree:
+
+```text
+Agent(isolation: "worktree")   # each agent gets its own checkout
+```
+
+Then merge the branches when they return. This is the normal answer for
+overlapping source files.
+
+**One exception, and it matters.** A worktree does not dissolve a conflict in a
+shared manifest, lockfile, or generated file. Two agents both adding
+dependencies to one `package.json`, both writing one migrations directory, or
+both regenerating one schema will conflict at merge time instead of at write
+time, and you will have a lockfile to reconcile by hand. For those files, give
+one agent ownership: have it make the edits up front while the others treat the
+file as read-only, or serialize just the tasks that touch it.
+
+Genuinely coupled reasoning is still a reason for one agent. "Fixing A might fix
+B" is coupling. "A and B both import from `types.ts`" is not — that is overlap,
+and overlap has a mechanism.
+
+## Fresh or forked
+
+**Fresh** — the agent gets only the brief you write. Right for self-contained
+work: a test file to fix, a subsystem to trace, a module to document. Most
+dispatches are fresh.
+
+**Forked** — `Agent(subagent_type: "fork")` gives the agent this conversation:
+its history, its reasoning, its dead ends. Right when reconstructing the
+situation would cost more than the work itself. You have spent an hour narrowing
+a bug and want a second architecture explored from where you already stand; a
+fresh agent would spend that hour again.
+
+**The trap.** A fork inherits your conclusions, so it is the wrong tool for
+challenging them. Asking a fork to stress-test your diagnosis hands it the
+diagnosis first, which is the bias you were trying to escape. Adversarial checks
+on your own reasoning get a fresh agent, briefed from the evidence rather than
+from what you concluded.
 
 ## The Pattern
 
@@ -131,7 +177,9 @@ Return: Summary of what you found and what you fixed.
 **Related failures:** Fixing one might fix others - investigate together first
 **Need full context:** Understanding requires seeing entire system
 **Exploratory debugging:** You don't know what's broken yet
-**Shared state:** Agents would interfere (editing same files, using same resources)
+
+Shared state used to be on this list. It is not a reason to serialize; it is a
+reason to isolate. See below.
 
 ## Real Example from Session
 
@@ -165,3 +213,11 @@ After agents return:
 2. **Check for conflicts** - Did agents edit same code?
 3. **Run full suite** - Verify all fixes work together
 4. **Spot check** - Agents can make systematic errors
+
+## Beyond this tier
+
+This skill covers subagents. When the work does not fit them — a mechanical
+change across dozens of separately reviewable units, workers that must agree on
+a contract as they go, a fan-out too large to drive from one context, or a job
+that should leave your session entirely — use **superpowers:orchestrating-agents**
+to pick the mechanism first.
