@@ -1,3 +1,8 @@
+> **This is a fork.** `LeoTexx/superpowers`, from `obra/superpowers` at v6.3.0,
+> with the agent-orchestration skills corrected for current Claude Code.
+> See [FORK.md](FORK.md) for what diverged, the evidence, and how to sync upstream.
+> Upstream's README follows unchanged.
+
 # Superpowers
 
 Superpowers is a complete software development methodology for your coding agents, built on top of a set of composable skills and some initial instructions that make sure your agent uses them.
