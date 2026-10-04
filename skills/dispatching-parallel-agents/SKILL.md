@@ -106,8 +106,10 @@ Each domain is independent - fixing tool approval doesn't affect abort tests.
 Each agent gets:
 - **Specific scope:** One test file or subsystem
 - **Clear goal:** Make these tests pass
+- **Done means:** checkable conditions — these tests pass, the rest of the file still passes, nothing outside scope changed
 - **Constraints:** Don't change other code
-- **Expected output:** Summary of what you found and fixed
+- **When to stop and report instead:** the fix needs code outside scope, or anything destructive
+- **Expected output:** "Needs from you" first (decisions, blockers), then what you found and fixed, with the test command and its output as evidence, and anything you could not confirm with where you looked
 
 ### 3. Dispatch in Parallel
 
@@ -125,10 +127,14 @@ Multiple dispatch calls in one response = parallel execution. One per response =
 ### 4. Review and Integrate
 
 When agents return:
-- Read each summary
+- Read each summary, and check its evidence (the command output it claims) before accepting it
 - Verify fixes don't conflict
 - Run full test suite
 - Integrate all changes
+
+To correct an agent that is still running or just returned, send it a
+follow-up message rather than dispatching a new one — it keeps what it has
+already learned.
 
 ## Agent Prompt Structure
 
@@ -155,7 +161,12 @@ These are timing/race condition issues. Your task:
 
 Do NOT just increase timeouts - find the real issue.
 
-Return: Summary of what you found and what you fixed.
+Done when all 3 tests pass and the rest of the file still passes. If the
+fix needs changes outside src/agents/, stop and report instead.
+
+Return: anything you need from me first; then root cause per test, what you
+changed, and the test command with its output. Mark anything you could not
+confirm.
 ```
 
 ## Common Mistakes
@@ -209,7 +220,7 @@ Agent 3 → Fix tool-approval-race-conditions.test.ts
 ## Verification
 
 After agents return:
-1. **Review each summary** - Understand what changed
+1. **Review each summary** - Understand what changed, and check the evidence it cites; a claim without output is unverified
 2. **Check for conflicts** - Did agents edit same code?
 3. **Run full suite** - Verify all fixes work together
 4. **Spot check** - Agents can make systematic errors

@@ -83,6 +83,36 @@ to challenge a conclusion hands it the conclusion first; that is the bias you
 were trying to escape. Adversarial checks on this session's own reasoning get a
 fresh agent and a brief written from evidence, not from your conclusion.
 
+## The brief
+
+Hand each agent the whole job in one message. Piece-by-piece dispatch costs a
+round trip per piece, and a restart costs more than a follow-up. Every brief
+states:
+
+- **Goal** — the outcome, not the steps to reach it.
+- **Done** — conditions the agent can check itself: tests pass, the old client
+  is gone, the grep returns nothing. For an agent building a user-facing flow
+  whose spec has a flow contract, that flow's acceptance criteria are Done
+  conditions; once the work lands, run `flow-audit check`.
+- **Stop and ask** — the decisions that belong to the user, and anything
+  destructive: deleting data, force-push, changes outside the repo. Everything
+  else, the agent proceeds on.
+- **Evidence** — what it must hand back for you to verify: commands run and
+  their output, `file:line`, what it could not confirm and where it looked.
+- **Report shape** — "needs from you" first, then the summary.
+
+Leave out "think carefully", "step by step", and their relatives. The model
+already decides how much to think; those lines delay the first token and buy
+nothing. When a task needs more depth, raise the effort — in the agent
+definition, or `/effort` in a session — not the adjectives in the prompt.
+
+If you remember something after dispatch, `SendMessage` it to the running agent.
+Do not kill and respawn to add one detail.
+
+For a run long enough that its context will be summarized, the brief names a
+checklist file (`TASKS.md`, or the plan the run is executing) that the agent
+ticks as it goes. The summary loses the scroll; the file survives.
+
 ## Cost ladder
 
 The table is ordered. Each mechanism costs more than the one above it in tokens,
@@ -138,6 +168,21 @@ Keep doing local work while children run. **Never state or infer a pending
 agent's result before its notification arrives** — a predicted result that turns
 out wrong is worse than no result, because it looks like evidence.
 
+## Accepting results
+
+A report is a claim, not a result. Before you accept it, check the evidence it
+cites: rerun the test, open the `file:line`, read the diff. In an audit or
+migration sliced across many agents, this is per agent — one unchecked slice is
+where the regression hides.
+
+Read each report's "needs from you" section first, and act on it before the
+summary. Before a person reviews the combined diff, run a review pass over it
+(**superpowers:requesting-code-review**). A review at modest effort catches most
+of what a person would, with fewer false alarms than it used to.
+
+When you report to the user, the same shape applies: what you need from them
+first, then what happened, with anything unconfirmed marked as such.
+
 ## Rationalizations
 
 | Excuse | Reality |
@@ -149,6 +194,10 @@ out wrong is worse than no result, because it looks like evidence.
 | "I'll fork it so it has full context" | Full context includes your conclusion. For an adversarial check that is the bug. |
 | "A workflow would obviously help here" | Then say so and ask. Workflows are opt-in. |
 | "I'll start the batch and show them the PRs" | The PRs are the thing they needed to agree to. |
+| "I'll tell it to think hard, this one matters" | Thinking depth follows effort, not wording. Raise the effort or leave it alone. |
+| "I'll send the next part once this part lands" | One brief with the whole job and a definition of done. Round trips are the cost. |
+| "The agent says tests pass" | Then the output is in its report. Check it before you pass the claim on. |
+| "I'll restart it with the extra detail" | `SendMessage` the detail. A restart throws away everything it has done. |
 
 ## Handing off
 

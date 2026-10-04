@@ -23,7 +23,11 @@ Tests failing (<N> failures). Must fix before completing:
 [Show failures]
 ```
 
-**If tests pass:** continue to Step 2.
+**If tests pass:** continue to Step 2 — provided the branch has had a
+whole-branch review (subagent-driven-development's final review counts). If
+it has not, run superpowers:requesting-code-review over the branch first and
+fix its Critical/Important findings: your human partner should review a diff
+a reviewer has already been through.
 
 ## Step 2: Detect Environment
 

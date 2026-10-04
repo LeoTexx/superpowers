@@ -32,7 +32,11 @@ and three skills stated rules the newer harness makes false.
 | `skills/subagent-driven-development/` | Parallel implementers allowed under proven-disjoint ownership or worktrees. Polling ban and timed waits removed — a finished subagent notifies you. `ultrareview` named for whole-branch review. |
 | `skills/executing-plans/` | Background-session and Agent Teams routes named. |
 | `skills/writing-plans/` | Survey before decomposing; a `Foundations` reuse budget; required `Reuses:`/`New:` per task; a subtraction check. |
-| `.claude-plugin/` | Marketplace renamed `superpowers-leo`, version `6.4.0-leo.1`. |
+| 14 skill files (2026-09-22) | Edits made directly in the installed plugin and reconciled here on 2026-10-04: the brief every agent gets (goal, done, stop-and-ask, evidence, report shape), no thinking-instructions, plan files as the durable checklist, and related wording across the review, debugging, verification and skill-writing skills. See the commit for the full diff. |
+| `skills/brainstorming/`, `skills/writing-plans/`, `skills/orchestrating-agents/` | One sentence each: a user-facing flow gets a flow contract (`flow-audit contract`) in the design, its acceptance criteria become plan constraints and agent Done conditions, and `flow-audit check` runs after the build. `flow-audit` lives in `~/.claude/skills/`, outside this plugin; the sentences are conditional on it being present. |
+| `.claude-plugin/` | Marketplace renamed `superpowers-leo`, version `6.4.0-leo.2`. |
+
+**Do not edit the installed copy.** `~/.claude/plugins/cache/` and `~/.claude/plugins/marketplaces/superpowers-leo` are overwritten by a plugin update. The September edits were made there and sat uncommitted for two weeks; one update would have erased them. Edit this repo, push `main`, then update the plugin.
 
 Three corrections worth knowing, because upstream still has them:
 

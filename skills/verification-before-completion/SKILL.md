@@ -30,6 +30,7 @@ BEFORE claiming any status or expressing satisfaction:
 4. VERIFY: Does output confirm the claim?
    - If NO: State actual status with evidence
    - If YES: State claim WITH evidence
+   - If you CAN'T run it: say the claim is unverified, and why
 5. ONLY THEN: Make the claim
 
 Skip any step = lying, not verifying

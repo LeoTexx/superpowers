@@ -41,6 +41,11 @@ Subagent (general-purpose):
 
     Work from: [directory]
 
+    **Done means:** every requirement in the brief is implemented, the
+    brief's tests (and any you added) pass, the full suite passes once
+    before your final commit, your work is committed, and your report file
+    is written. Short of all of these, your status is not DONE.
+
     **While you work:** If you encounter something unexpected or unclear, **ask questions**.
     It's always OK to pause and clarify. Don't guess or make assumptions.
 
@@ -83,6 +88,9 @@ Subagent (general-purpose):
     - You feel uncertain about whether your approach is correct
     - The task involves restructuring existing code in ways the plan didn't anticipate
     - You've been reading file after file trying to understand the system without progress
+    - The task would need something destructive or outside [directory] —
+      deleting data, force-pushing, rewriting history, editing files the
+      task doesn't own
 
     **How to escalate:** Report back with status BLOCKED or NEEDS_CONTEXT. Describe
     specifically what you're stuck on, what you've tried, and what kind of help you need.
@@ -129,7 +137,8 @@ Subagent (general-purpose):
 
     Write your full report to [REPORT_FILE]:
     - What you implemented (or what you attempted, if blocked)
-    - What you tested and test results
+    - What you tested: the commands you ran and their output (the controller
+      checks this evidence before accepting the task)
     - **TDD Evidence** (if TDD was required for this task):
       - RED: command run, relevant failing output before implementation, and why the failure was expected
       - GREEN: command run and relevant passing output after implementation
@@ -140,6 +149,8 @@ Subagent (general-purpose):
     Then report back with ONLY (under 15 lines — the detail lives in the
     report file):
     - **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
+    - **Needs from you:** what you need from the controller (a decision,
+      missing context, approval for a destructive step) — "none" if nothing
     - Commits created (short SHA + subject)
     - One-line test summary (e.g. "14/14 passing, output pristine")
     - Your concerns, if any

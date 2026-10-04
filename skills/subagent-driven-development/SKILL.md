@@ -191,7 +191,9 @@ Use the least powerful model that can handle each role to conserve cost and incr
 
 **Architecture and design tasks**: use the most capable available model.
 The final whole-branch review is one of these — dispatch it on the most
-capable available model, not the session default.
+capable available model, not the session default. It does not also need the
+highest effort setting: on current models a lower-effort review has beaten
+the previous generation at high effort, with fewer false alarms.
 
 **Review tasks**: choose the model with the same judgment, scaled to the
 diff's size, complexity, and risk. A small mechanical diff does not need the
@@ -200,6 +202,12 @@ small fix diffs take a cheap-to-mid tier.
 
 **Fix-loop escalation (rounds 4-5)**: use a model at least one tier above
 the implementer that got stuck.
+
+**Rigor is a setting, not a phrase.** When a role needs more depth, raise
+its model tier or its effort (the agent definition's effort/model
+frontmatter, or `/effort` for your own session). Do not write "think hard"
+or "step by step" into a dispatch — current models already reason before
+answering, and those words only delay output.
 
 **Always specify the model explicitly when dispatching a subagent.** An
 omitted model inherits your session's model — often the most capable and
@@ -291,15 +299,15 @@ Template: [implementer-prompt.md](implementer-prompt.md)
 
 Implementer subagents report one of four statuses. Handle each appropriately:
 
-**DONE:** Generate the review package (`scripts/review-package PLAN_FILE BASE HEAD`, from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path.
+**DONE:** Check the report file carries the test commands and their output (and RED/GREEN evidence if the task required TDD) — a DONE without evidence goes back to the implementer to supply it. Then generate the review package (`scripts/review-package PLAN_FILE BASE HEAD`, from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path.
 
 **DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before review. If they're observations (e.g., "this file is getting large"), note them and proceed to review.
 
-**NEEDS_CONTEXT:** The implementer needs information that wasn't provided. Provide the missing context and re-dispatch.
+**NEEDS_CONTEXT:** The implementer needs information that wasn't provided. Send the missing context to the same implementer as a follow-up message — its work so far stays intact. Re-dispatch fresh only if your harness cannot message a live subagent.
 
 **BLOCKED:** The implementer cannot complete the task. Assess the blocker:
-1. If it's a context problem, provide more context and re-dispatch with the same model
-2. If the task requires more reasoning, re-dispatch with a more capable model
+1. If it's a context problem, send the context to the same implementer (or re-dispatch with the same model if you cannot message it)
+2. If the task requires more reasoning, re-dispatch with a more capable model or higher effort
 3. If the task is too large, break it into smaller pieces
 4. If the plan itself is wrong, rule on the correction, ledger it, and re-dispatch with the ruling carried in the dispatch
 
@@ -480,6 +488,11 @@ residual load-bearing findings surface to your human partner when
 finishing-a-development-branch presents the options.
 
 ## Finish
+
+Your final message opens with **Needs from you**: residual load-bearing
+findings, the `ultrareview` recommendation if you are making one, and any
+destructive or outside-the-worktree step you held back — or "nothing". Then
+the summary.
 
 Before you delete anything, collect every ledger line containing `Ruling:` —
 preflight rulings, parked findings, breaker adjudications, all of them — into

@@ -15,6 +15,7 @@ Dispatch a code reviewer subagent to catch issues before they cascade. The revie
 - After each task in subagent-driven development
 - After completing major feature
 - Before merge to main
+- Before handing a diff to your human partner to review, or opening a PR — they should see it after the reviewer's findings are fixed, not before
 
 **Optional but valuable:**
 - When stuck (fresh perspective)
@@ -32,6 +33,8 @@ HEAD_SHA=$(git rev-parse HEAD)
 **2. Dispatch code reviewer subagent:**
 
 Dispatch a `general-purpose` subagent, filling the template at [code-reviewer.md](code-reviewer.md)
+
+Set its model explicitly, scaled to the diff's size and risk (see superpowers:subagent-driven-development's Model Selection). A review does not automatically need the top tier or the top effort setting — on current models a lower-effort review has beaten the previous generation at high effort, with fewer false alarms.
 
 **Placeholders:**
 - `{DESCRIPTION}` - Brief summary of what you built

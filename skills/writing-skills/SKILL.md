@@ -611,6 +611,10 @@ step2 [label="read file"];
 helper1, helper2, step3, pattern4
 **Why bad:** Labels should have semantic meaning
 
+### ❌ Thinking-Instructions
+"Think carefully before...", "think step by step", "ultrathink"
+**Why bad:** Current models already reason before answering; these only delay output. Keep the requirement ("check the empty-input case"), drop the verb. Rigor comes from effort settings, not wording. See [anthropic-best-practices.md](anthropic-best-practices.md).
+
 ## STOP: Before Moving to Next Skill
 
 **After writing ANY skill, you MUST STOP and complete the deployment process.**
@@ -659,6 +663,7 @@ Deploying untested skills = deploying untested code. It's a violation of quality
 - [ ] Quick reference table
 - [ ] Common mistakes section
 - [ ] No narrative storytelling
+- [ ] No thinking-instructions ("think carefully", "step by step")
 - [ ] Supporting files only for tools or heavy reference
 
 **Deployment:**
