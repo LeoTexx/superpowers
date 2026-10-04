@@ -135,11 +135,13 @@ Skills act as additions to models, so effectiveness depends on the underlying mo
 
 **Testing considerations by model**:
 
-* **Claude Haiku** (fast, economical): Does the Skill provide enough guidance?
-* **Claude Sonnet** (balanced): Is the Skill clear and efficient?
-* **Claude Opus** (powerful reasoning): Does the Skill avoid over-explaining?
+* **Claude Haiku 4.5** (fast, economical): Does the Skill provide enough guidance?
+* **Claude Sonnet 5** (balanced): Is the Skill clear and efficient?
+* **Claude Opus 5.5** (most capable): Does the Skill avoid over-explaining?
 
 What works perfectly for Opus might need more detail for Haiku. If you plan to use your Skill across multiple models, aim for instructions that work well with all of them.
+
+Test at the effort levels the Skill will actually run at, too. How deeply a current model reasons is set by its effort setting, not by the Skill's wording — so a Skill that seems to need more rigor should say to raise effort (or set it in an agent definition), not add phrasing to the prompt.
 
 ## Skill structure
 
@@ -594,6 +596,10 @@ Choose one term and use it throughout the Skill:
 * Mix "extract", "pull", "get", "retrieve"
 
 Consistency helps agents understand and follow instructions.
+
+### Don't instruct the model how to think
+
+Leave out thinking-instructions: "think carefully", "think hard", "think step by step", "ultrathink", "take your time", or "think through X before...". Current Claude models already reason before responding and choose their own depth; these phrases delay output without improving it. If a line carries a real requirement, keep the requirement and drop the verb — "consider the empty-input and timeout cases" rather than "think carefully about edge cases". Numbered steps describing a *procedure* are fine; the rule is about telling the model how to reason.
 
 ## Common patterns
 
@@ -1114,6 +1120,7 @@ Before sharing a Skill, verify:
 * [ ] File references are one level deep
 * [ ] Progressive disclosure used appropriately
 * [ ] Workflows have clear steps
+* [ ] No thinking-instructions ("think carefully", "step by step", "ultrathink")
 
 ### Code and scripts
 
@@ -1129,7 +1136,7 @@ Before sharing a Skill, verify:
 ### Testing
 
 * [ ] At least three evaluations created
-* [ ] Tested with Haiku, Sonnet, and Opus
+* [ ] Tested with Haiku 4.5, Sonnet 5, and Opus 5.5
 * [ ] Tested with real usage scenarios
 * [ ] Team feedback incorporated (if applicable)
 

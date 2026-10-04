@@ -111,6 +111,11 @@ Subagent (general-purpose):
     ### Recommendations
     [Improvements for code quality, architecture, or process]
 
+    ### Not Verified
+    [Anything you could not confirm from what you read — e.g. whether tests
+    pass, behavior in code outside the diff — and where you looked. "None" if
+    none.]
+
     ### Assessment
 
     **Ready to merge?** [Yes | No | With fixes]
@@ -140,7 +145,7 @@ Subagent (general-purpose):
 - `[BASE_SHA]` — starting commit
 - `[HEAD_SHA]` — ending commit
 
-**Reviewer returns:** Strengths, Issues (Critical / Important / Minor), Recommendations, Assessment
+**Reviewer returns:** Strengths, Issues (Critical / Important / Minor), Recommendations, Not Verified, Assessment
 
 ## Example Output
 

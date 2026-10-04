@@ -82,7 +82,7 @@ your path and complete them in order.
 2. **Present question + probe plan** — 2-3 sentences
 3. **Get approval** — a nod is enough
 4. **Investigate** — as cheaply as correctness allows
-5. **Report findings** — a recommendation; label anything built as throwaway
+5. **Report findings** — a recommendation; mark what you could not confirm and where you looked; label anything built as throwaway
 
 **Bounded:**
 1. **Explore project context** — check files, docs, recent commits
@@ -184,6 +184,7 @@ is the whole process.
 - Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced
 - Ask after each section whether it looks right so far
 - Cover: architecture, components, data flow, error handling, testing
+- When the design includes a user-facing flow (signup, onboarding, pricing, checkout), run `flow-audit contract` if that skill is available and include the flow contract as a section of the design: a flow that does not lead to first value is cheaper to fix here than after it is built
 - Be ready to go back and clarify if something doesn't make sense
 
 **Design for isolation and clarity:**

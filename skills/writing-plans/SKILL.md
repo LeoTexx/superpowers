@@ -120,7 +120,7 @@ independently testable deliverable.
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking — tick each box as you finish it; this file is the durable checklist that survives context compaction.
 
 **Goal:** [One sentence describing what this builds]
 
@@ -150,7 +150,9 @@ skipped.]
 [The spec's project-wide requirements — version floors, dependency limits,
 naming and copy rules, platform requirements — one line each, with exact
 values copied verbatim from the spec. Every task's requirements implicitly
-include this section.]
+include this section. When the spec has a flow contract, its acceptance
+criteria go here verbatim, and each task that builds that flow names the
+criteria it satisfies.]
 
 ---
 ```

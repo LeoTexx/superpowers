@@ -211,6 +211,14 @@ You MUST complete each phase before proceeding to the next.
 
    This is NOT a failed hypothesis - this is a wrong architecture.
 
+## Reporting a Diagnosis
+
+Whenever you report findings — to your human partner, or to a controller as a
+subagent — separate what you confirmed (reproduced, or shown by evidence you
+cite) from what you only suspect. Say where you looked: the logs, files,
+commands and layers you checked, and what each ruled out. An unmarked guess
+reads as a finding.
+
 ## Red Flags - STOP and Follow Process
 
 If you catch yourself thinking:
@@ -228,7 +236,7 @@ If you catch yourself thinking:
 
 **ALL of these mean: STOP. Return to Phase 1.**
 
-**If 3+ fixes failed:** Question the architecture (see Phase 4.5)
+**If 3+ fixes failed:** Question the architecture (see Phase 4, step 5)
 
 ## your human partner's Signals You're Doing It Wrong
 
@@ -268,7 +276,7 @@ If you catch yourself thinking:
 If systematic investigation reveals issue is truly environmental, timing-dependent, or external:
 
 1. You've completed the process
-2. Document what you investigated
+2. Document what you investigated — where you looked, what each check ruled out, and what remains unconfirmed
 3. Implement appropriate handling (retry, timeout, error message)
 4. Add monitoring/logging for future investigation
 

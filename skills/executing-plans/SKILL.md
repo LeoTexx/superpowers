@@ -43,7 +43,15 @@ For each task:
 1. Mark as in_progress
 2. Follow each step exactly (plan has bite-sized steps)
 3. Run verifications as specified
-4. Mark as completed
+4. Mark as completed — in the todo list and in the plan file, ticking its checkboxes
+
+The plan file is your durable checklist. Todos and conversation memory do
+not survive compaction; the ticked plan file does. After compaction, resume
+at the first unticked step and trust the file and `git log` over your
+recollection.
+
+Keep going between tasks: no check-ins, and status goes in the same message
+as the next action. The stop conditions below are the only reasons to pause.
 
 ### Step 3: Complete Development
 
@@ -59,6 +67,7 @@ After all tasks complete and verified:
 - Plan has critical gaps preventing starting
 - You don't understand an instruction
 - Verification fails repeatedly
+- The next step is destructive or reaches outside the repo (deleting data, force-pushing, touching shared infrastructure)
 
 **Ask for clarification rather than guessing.**
 
