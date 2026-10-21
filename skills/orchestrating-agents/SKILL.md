@@ -30,6 +30,7 @@ Take the first row that matches.
 | Tasks write, and the plan states file ownership with no intersection | Parallel subagents, one checkout |
 | Tasks write, and ownership overlaps or is unstated | One worktree per agent — but read Isolation first |
 | An agent needs reasoning this conversation already did | Forked subagent |
+| The job must run unattended until a fixed scope is finished — hours, overnight | Ralph under `ralph-done` — see the `ralph` skill |
 | The work is independent of your next step | Background session |
 | Workers must agree on a contract while they work | Agent Teams — see the `maestro` skill |
 | The same mechanical change across many separately reviewable units | `/batch` |
@@ -94,6 +95,11 @@ states:
   is gone, the grep returns nothing. For an agent building a user-facing flow
   whose spec has a flow contract, that flow's acceptance criteria are Done
   conditions; once the work lands, run `flow-audit check`.
+  For a run that outlasts one session — unattended, overnight, or long enough
+  to be compacted — Done is not the agent's judgement. It is a feature list
+  covering the whole job, frozen before the run, and a command that counts it
+  (`ralph-done gate`). An agent that grades its own finish line ships the first
+  phase and reports the job complete.
 - **Stop and ask** — the decisions that belong to the user, and anything
   destructive: deleting data, force-push, changes outside the repo. Everything
   else, the agent proceeds on.
@@ -111,7 +117,9 @@ Do not kill and respawn to add one detail.
 
 For a run long enough that its context will be summarized, the brief names a
 checklist file (`TASKS.md`, or the plan the run is executing) that the agent
-ticks as it goes. The summary loses the scroll; the file survives.
+ticks as it goes. The summary loses the scroll; the file survives. When the run
+is unattended, that file is the frozen feature list: the agent may tick items
+and append missing ones, never delete, reword or move them to "later".
 
 ## Cost ladder
 
@@ -198,6 +206,8 @@ first, then what happened, with anything unconfirmed marked as such.
 | "I'll send the next part once this part lands" | One brief with the whole job and a definition of done. Round trips are the cost. |
 | "The agent says tests pass" | Then the output is in its report. Check it before you pass the claim on. |
 | "I'll restart it with the extra detail" | `SendMessage` the detail. A restart throws away everything it has done. |
+| "It's big, so this run does phase 0 and the rest are follow-ups" | Splitting orders the work; it does not end it. Every phase goes in the done list, and the run ends when all of them pass. |
+| "Agent Teams for the overnight run" | Teams need an interactive session and do not start under `claude -p`. Unattended runs use Ralph, in parallel lanes on worktrees if needed. |
 
 ## Handing off
 

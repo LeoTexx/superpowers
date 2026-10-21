@@ -51,6 +51,8 @@ Three anti-goals, because each is a plausible-sounding road to the opposite:
 
 If the spec covers multiple independent subsystems, it should have been broken into sub-project specs during brainstorming. If it wasn't, suggest breaking this into separate plans — one per subsystem. Each plan should produce working, testable software on its own.
 
+If the plans will be executed unattended to completion (Ralph or `ralph-done`, a background session, an overnight loop), they cover every sub-project in build order, and the run's definition of done is all of them. Sections order the work; they are not stopping points. Work goes under "Future", "Phase 2" or "follow-up" only when the user put it out of scope.
+
 ## Survey Before You Decompose
 
 Find out what already exists before mapping files. This is the step that decides
