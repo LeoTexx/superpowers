@@ -572,6 +572,15 @@ Run same scenarios WITH skill. Agent should now comply.
 
 Agent found new rationalization? Add explicit counter. Re-test until bulletproof.
 
+### Iterating Against Many Scenarios
+
+Past a handful of scenarios, editing against all of them overfits the skill to those cases.
+
+- Split into **train** (the editor sees the failures) and **held-out test** (never shown to the editor).
+- Keep an edit only if both sets improve. Train up with test flat is the overfitting sign: revert.
+- One change per round, so a regression has one suspect.
+- Edits describe the wanted behaviour, never the failing case's content. Keep answer keys out of any directory the agent can read.
+
 ### Micro-Test Wording Before Full Scenarios
 
 Full pressure-scenario runs are the final gate, but they are slow and expensive per iteration. Verify the wording itself first with micro-tests:

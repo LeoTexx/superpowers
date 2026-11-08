@@ -72,10 +72,13 @@ digraph process {
         "Spec ✅ and quality approved?" [shape=diamond];
         "Finding conflicts with plan text?" [shape=diamond];
         "Rule on the conflict, ledger the ruling" [shape=box];
-        "Fix round R of 5: R≤3 resume implementer; R≥4 fresh implementer, more capable model" [shape=box];
+        "Fix round R: resume implementer, or fresh coder on a stronger model after a capability ruling" [shape=box];
         "Dispatch scoped re-review (./re-review-prompt.md)" [shape=box];
         "All findings addressed?" [shape=diamond];
-        "R = 5?" [shape=diamond];
+        "R ≥ 3?" [shape=diamond];
+        "Checkpoint: implementer defends another round" [shape=box];
+        "Defence holds?" [shape=diamond];
+        "Hard stop: escalate the pattern to the user" [shape=box];
         "Adjudicate each open finding" [shape=box];
         "Any load-bearing finding?" [shape=diamond];
         "Rule and continue; stop only if every path forward is a guess" [shape=box];
@@ -100,14 +103,18 @@ digraph process {
     "Spec ✅ and quality approved?" -> "Append completion to ledger, mark todo complete" [label="yes"];
     "Spec ✅ and quality approved?" -> "Finding conflicts with plan text?" [label="no"];
     "Finding conflicts with plan text?" -> "Rule on the conflict, ledger the ruling" [label="yes"];
-    "Rule on the conflict, ledger the ruling" -> "Fix round R of 5: R≤3 resume implementer; R≥4 fresh implementer, more capable model";
-    "Finding conflicts with plan text?" -> "Fix round R of 5: R≤3 resume implementer; R≥4 fresh implementer, more capable model" [label="no"];
-    "Fix round R of 5: R≤3 resume implementer; R≥4 fresh implementer, more capable model" -> "Dispatch scoped re-review (./re-review-prompt.md)";
+    "Rule on the conflict, ledger the ruling" -> "Fix round R: resume implementer, or fresh coder on a stronger model after a capability ruling";
+    "Finding conflicts with plan text?" -> "Fix round R: resume implementer, or fresh coder on a stronger model after a capability ruling" [label="no"];
+    "Fix round R: resume implementer, or fresh coder on a stronger model after a capability ruling" -> "Dispatch scoped re-review (./re-review-prompt.md)";
     "Dispatch scoped re-review (./re-review-prompt.md)" -> "All findings addressed?";
     "All findings addressed?" -> "Append completion to ledger, mark todo complete" [label="yes"];
-    "All findings addressed?" -> "R = 5?" [label="no"];
-    "R = 5?" -> "Fix round R of 5: R≤3 resume implementer; R≥4 fresh implementer, more capable model" [label="no - next round"];
-    "R = 5?" -> "Adjudicate each open finding" [label="yes - breaker trips"];
+    "All findings addressed?" -> "R ≥ 3?" [label="no"];
+    "R ≥ 3?" -> "Fix round R: resume implementer, or fresh coder on a stronger model after a capability ruling" [label="no - next round"];
+    "R ≥ 3?" -> "Checkpoint: implementer defends another round" [label="yes"];
+    "Checkpoint: implementer defends another round" -> "Defence holds?";
+    "Defence holds?" -> "Fix round R: resume implementer, or fresh coder on a stronger model after a capability ruling" [label="yes - green light"];
+    "Defence holds?" -> "Hard stop: escalate the pattern to the user" [label="no - hard stop"];
+    "Hard stop: escalate the pattern to the user" -> "Adjudicate each open finding";
     "Adjudicate each open finding" -> "Any load-bearing finding?";
     "Any load-bearing finding?" -> "Rule and continue; stop only if every path forward is a guess" [label="yes"];
     "Any load-bearing finding?" -> "Park findings in ledger with rulings" [label="no"];
@@ -200,8 +207,12 @@ diff's size, complexity, and risk. A small mechanical diff does not need the
 most capable model; a subtle concurrency change does. Scoped re-reviews of
 small fix diffs take a cheap-to-mid tier.
 
-**Fix-loop escalation (rounds 4-5)**: use a model at least one tier above
-the implementer that got stuck.
+**Fix-loop escalation: diagnose before escalating.** First check the
+implementer had a check it could run; if not, give it one. Then match the
+failure: missed edge cases or unrun checks → raise its effort first (about one
+retry's cost, and the cache survives); the same problem surviving an effort
+raise → a model at least one tier above; a wrong approach or a misread
+requirement → neither, that is a hard stop and a re-spec.
 
 **Rigor is a setting, not a phrase.** When a role needs more depth, raise
 its model tier or its effort (the agent definition's effort/model
@@ -248,6 +259,10 @@ pending agent's result before its notification arrives: a predicted result that
 turns out wrong is worse than no result, because it reads as evidence.
 
 ### 1. Dispatch the implementer
+
+Implementers are dispatched as `Agent(subagent_type: "coder", model: ...)`, not
+general-purpose: the `coder` agent carries the standing coding standard, so the
+dispatch holds only the task. Reviewers stay on their own templates.
 
 Record BASE (`git rev-parse HEAD`) before dispatching — the review package
 and fix-round diffs need it.
@@ -382,20 +397,40 @@ Before the loop starts, two routes leave it immediately:
   the plan mandates it, and do not dispatch a fix that contradicts the plan
   without a recorded ruling.
 Everything else enters the loop. A fix round is one fix dispatch plus one
-scoped re-review. Five rounds maximum per task:
+scoped re-review. There is no fixed round cap: from round 3 on, every further
+round has to be earned at a checkpoint.
 
-**Rounds 1-3 — resume the original implementer.** Send it the open findings
-verbatim. Its context is intact: it knows the task, the code, and its own
+**Rounds 1-2 — resume the original implementer.** Send it only the open
+Important findings (Critical and Important; never Minor), each naming the class
+with every instance. Re-review is scoped to the new diff and never repeats a
+finding already answered. Send the findings verbatim. Its context is intact: it knows the task, the code, and its own
 choices. If your harness cannot send another message to a live subagent,
-dispatch a fresh implementer carrying the brief path, the report-file path,
+dispatch a fresh `coder` carrying the brief path, the report-file path,
 and the findings — the report file is the persistent memory either way.
 
-**Rounds 4-5 — dispatch a fresh implementer on a more capable model** (per
-Model Selection), with the brief path, the report-file path, the open
-findings, and this framing: "A prior implementer attempted this task
-[N] times; you own it now. Read the report file for what was tried." A loop
-that survives three resumes usually means the implementer cannot see its
-own problem — fresh eyes and a capability bump in one move.
+**Round 3 onward — checkpoint before every round.** Ask the implementer to
+defend another round. Its defence states: open Important findings per round
+so far (the trend), whether the latest findings are new classes or ones that
+came back, any fix that undid an earlier one, what the next round would
+change, and its recommendation (continue, fresh agent on a stronger model,
+or stop). You rule:
+
+- **Green light — continue:** the open count is falling and the new findings
+  are genuinely new, not re-findings. Resume the implementer.
+- **Green light — raise effort, then the model:** when the open findings are missed cases or unrun checks, resume the implementer at higher effort first. Escalate the model only when the same problem survives that.
+- **Green light — escalate the model:** the findings are clear and right, but
+  the implementer misses what they plainly say or its fixes break something
+  new the same way. Dispatch a fresh `coder` on a more capable model (per
+  Model Selection) with the brief path, the report-file path, the open
+  findings, and: "A prior implementer attempted this task <R> times; you own
+  it now. Read the report file for what was tried."
+- **Hard stop:** the count is flat or rising, findings come back after being
+  fixed, fixes contradict each other, or the findings trace to the plan's
+  design rather than the code. The approach is the problem. Escalate the
+  pattern to the user in the final message's **Needs from you**, then take
+  the breaker below so the run does not stall.
+
+Ledger every ruling: `Task <N>: checkpoint R<R> — <green light|escalate|hard stop> — <why>`.
 
 **Every round, either way:** the implementer fixes, re-runs the tests
 covering the amended code, appends its fix report to the same report file,
@@ -415,13 +450,12 @@ findings list. Out-of-scope observations go to the ledger as deferred
 minors — they never extend the loop.
 
 **After each round,** append to the ledger:
-`Task <N>: fix round <R>/5 (<X> addressed, <Y> open — <finding one-liners>; commits <a7>..<b7>)`
+`Task <N>: fix round <R> (<X> addressed, <Y> open — <finding one-liners>; commits <a7>..<b7>)`
 
 Never fix findings yourself in the controller session — your context stays
 clean for coordination, and controller fixes skip review.
 
-**The breaker.** When round 5's re-review still leaves findings open, stop
-dispatching. Adjudicate each open finding yourself — you hold the plan and
+**The breaker.** When a checkpoint ends in a hard stop, stop dispatching. Adjudicate each open finding yourself — you hold the plan and
 the cross-task context the reviewer lacks:
 
 - **The reviewer is wrong, or the point is contestable:** park it —
@@ -475,7 +509,7 @@ human, and surface `ultrareview` as a recommendation when you hand the finished
 work over.
 
 If the final whole-branch review returns findings, dispatch ONE fix subagent
-with the complete findings list — not one fixer per finding.
+(`coder`) with the complete findings list — not one fixer per finding.
 Per-finding fixers each rebuild context and re-run suites; a real
 session's final-review fix wave cost more than all its tasks combined.
 Then run exactly one scoped re-review of the fix wave
@@ -580,7 +614,7 @@ Re-reviewer: Missing progress reporting — ADDRESSED (src/recovery.js:41).
   Magic number — ADDRESSED (src/recovery.js:7). New breakage: none.
   Verdict: all findings addressed.
 
-[Ledger: Task 2: fix round 1/5 (2 addressed, 0 open; commits d4e5f6a..b7c8d9e)]
+[Ledger: Task 2: fix round 1 (2 addressed, 0 open; commits d4e5f6a..b7c8d9e)]
 [Ledger: Task 2: complete (commits d4e5f6a..b7c8d9e, review clean)]
 
 ...

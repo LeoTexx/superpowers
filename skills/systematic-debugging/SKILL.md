@@ -165,6 +165,11 @@ You MUST complete each phase before proceeding to the next.
    - Ask for help
    - Research more
 
+5. **When Stuck or Flaky**
+   - After two hypotheses failed, or when the bug is intermittent: dispatch 2-4 read-only agents in parallel, each from a different evidence source (logs, git history of the area, the code path, a fresh reproduction attempt)
+   - Each returns one hypothesis with its evidence; a separate refuter tries to break each one
+   - Test only what survives, minimally, as in step 2. A flaky fix is proven by repeated runs on base and branch, not one green run
+
 ### Phase 4: Implementation
 
 **Fix the root cause, not the symptom:**
